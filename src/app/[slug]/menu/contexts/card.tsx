@@ -3,7 +3,7 @@
 import { Product } from "@prisma/client";
 import { createContext, ReactNode, useState } from "react";
 
-interface CardProduct extends Product {
+export interface CardProduct extends Product {
   quantity: number;
 }
 
@@ -50,6 +50,10 @@ export const CardProvider = ({ children }: { children: ReactNode }) => {
       });
     });
   };
+
+  const decreaseProductQuantity () => {
+    
+  }
 
   return (
     <CardContext.Provider
