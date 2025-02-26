@@ -1,13 +1,17 @@
 import Image from "next/image";
-import { CardProduct } from "../../contexts/card";
+import { CardContext, CardProduct } from "../../contexts/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon, TrashIcon } from "lucide-react";
+import { useContext } from "react";
 
 interface CardItemProps {
   product: CardProduct;
 }
 
 const CardItem = ({ product }: CardItemProps) => {
+  const { encreaseProductQuantity, decreaseProductQuantity } =
+    useContext(CardContext);
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -29,13 +33,21 @@ const CardItem = ({ product }: CardItemProps) => {
           </p>
 
           <div className="flex items-center gap-1">
-            <Button className="h-7 w-7 rounded-lg" variant="outline">
+            <Button
+              className="h-7 w-7 rounded-lg"
+              variant="outline"
+              onClick={() => decreaseProductQuantity(product.id)}
+            >
               <ChevronLeftIcon />
             </Button>
 
             <p className="text-xs w-7 text-center"> {product.quantity}</p>
 
-            <Button className="h-7 w-7 rounded-lg" variant="destructive">
+            <Button
+              className="h-7 w-7 rounded-lg"
+              variant="destructive"
+              onClick={() => encreaseProductQuantity(product.id)}
+            >
               <ChevronRightIcon />
             </Button>
           </div>
