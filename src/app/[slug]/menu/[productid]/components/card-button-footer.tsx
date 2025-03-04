@@ -21,6 +21,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { createOrder } from "../../actions/create-order";
+import { useParams, useSearchParams } from "next/navigation";
+import { ConsumptionMethod } from "@prisma/client";
+import { useContext, useTransition } from "react";
+import { CardContext } from "../../contexts/card";
+import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
 
 const formSchema = z.object({
   clientName: z.string().trim().min(1, {
@@ -31,7 +38,17 @@ const formSchema = z.object({
   }),
 });
 
-export const CardButtonFooter = () => {
+interface FinishOrderDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+type FormSchema = z.infer<typeof formSchema>;
+
+export const CardButtonFooter = ({
+  open,
+  onOpenChange,
+}: FinishOrderDialogProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,28 +57,50 @@ export const CardButtonFooter = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("On Submit called");
+  const searcParams = useSearchParams();
+  const { products } = useContext(CardContext);
+  const { slug } = useParams<{ slug: string }>();
+  const [isPending, startTransition] = useTransition();
 
-    console.log(values);
+  async function onSubmit(data: FormSchema) {
+    try {
+      const consumptionMethod = searcParams.get(
+        "consumptionMethod"
+      ) as ConsumptionMethod;
+
+      startTransition(async () => {
+        await createOrder({
+          consumptionMethod,
+          customerName: data.clientName,
+          customerPhone: data.clientPhone,
+          products,
+          slug,
+        });
+        onOpenChange(false);
+        toast.success("Pedido Finalizado com Sucesso!");
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
-    <div>
-      <Drawer>
-        <DrawerTrigger asChild>
-          <Button className="w-full rounded-full " variant="secondary">
-            Finalizar Pedido
-          </Button>
-        </DrawerTrigger>
+    <div className="p-5">
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerTrigger asChild></DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>Are you absolutely sure?</DrawerTitle>
-            <DrawerDescription>This action cannot be undone.</DrawerDescription>
+            <DrawerTitle>Finalizar Pedido</DrawerTitle>
+            <DrawerDescription>
+              Insira suas informações abaixo para finalizar o seu pedido
+            </DrawerDescription>
           </DrawerHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8 px-5"
+            >
               <FormField
                 control={form.control}
                 name="clientName"
@@ -75,8 +114,26 @@ export const CardButtonFooter = () => {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="clientPhone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Whatsapp</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Digite seu whatsapp" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DrawerFooter>
-                <Button type="submit">Finalizar Pedido</Button>
+                <Button type="submit" disabled={isPending}>
+                  {" "}
+                  {isPending && <Loader2Icon className="animate-spin" />}{" "}
+                  Finalizar
+                </Button>
                 <DrawerClose asChild>
                   <Button variant="outline">Cancelar</Button>
                 </DrawerClose>

@@ -9,7 +9,7 @@ interface CardItemProps {
 }
 
 const CardItem = ({ product }: CardItemProps) => {
-  const { encreaseProductQuantity, decreaseProductQuantity } =
+  const { encreaseProductQuantity, decreaseProductQuantity, deleteProduct } =
     useContext(CardContext);
 
   return (
@@ -54,7 +54,11 @@ const CardItem = ({ product }: CardItemProps) => {
         </div>
       </div>
 
-      <Button className="h-7 w-7 rounded-lg" variant="outline">
+      <Button
+        className="h-7 w-7 rounded-lg"
+        variant="outline"
+        onClick={() => deleteProduct(product.id)}
+      >
         <TrashIcon />
       </Button>
     </div>
