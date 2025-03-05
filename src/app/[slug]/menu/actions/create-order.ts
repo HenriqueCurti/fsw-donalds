@@ -55,5 +55,5 @@ export const createOrder = async (input: CreateOrderProps) => {
     },
   });
 
-  redirect(`/${input.slug}/orders`);
+  redirect(`/${input.slug}/orders?phone=${input.customerPhone}`);
 };

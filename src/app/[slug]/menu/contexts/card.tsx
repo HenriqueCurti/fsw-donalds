@@ -9,6 +9,7 @@ export interface CardProduct extends Product {
 
 export interface ICardContext {
   total: number;
+  quantityCard: number;
   isOpen: boolean;
   products: CardProduct[];
   toggleCard: () => void;
@@ -20,6 +21,7 @@ export interface ICardContext {
 
 export const CardContext = createContext<ICardContext>({
   total: 0,
+  quantityCard: 0,
   isOpen: false,
   products: [],
   toggleCard: () => {},
@@ -96,10 +98,15 @@ export const CardProvider = ({ children }: { children: ReactNode }) => {
     return (acc = acc + product.price * product.quantity);
   }, 0);
 
+  const quantityCard = products.reduce((acc, product) => {
+    return (acc = acc + product.quantity);
+  }, 0);
+
   return (
     <CardContext.Provider
       value={{
         total,
+        quantityCard,
         isOpen,
         products,
         toggleCard,
