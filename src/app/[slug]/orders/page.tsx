@@ -22,6 +22,11 @@ const OrdersPage = async ({ searchParams }: OrderPageProps) => {
     },
     include: {
       restaurant: true,
+      orderProducts: {
+        include: {
+          product: true,
+        },
+      },
     },
   });
 

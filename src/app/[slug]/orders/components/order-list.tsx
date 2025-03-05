@@ -1,7 +1,10 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Prisma } from "@prisma/client";
 import { ChevronLeftIcon, ScrollTextIcon } from "lucide-react";
 import OrderItem from "./order-item";
+import { useRouter } from "next/navigation";
 
 interface OrderListProps {
   orders: Prisma.OrderGetPayload<{
@@ -12,14 +15,30 @@ interface OrderListProps {
           avatarImageUrl: true;
         };
       };
+      orderProducts: {
+        include: {
+          product: true;
+        };
+      };
     };
   }>[];
 }
 
 const OrderList = ({ orders }: OrderListProps) => {
+  const router = useRouter();
+
+  const handleBackPage = () => {
+    router.back();
+  };
+
   return (
     <div className="space-y-6 p-6">
-      <Button size="icon" variant="outline" className="rounded-full">
+      <Button
+        onClick={handleBackPage}
+        size="icon"
+        variant="outline"
+        className="rounded-full"
+      >
         <ChevronLeftIcon />
       </Button>
 

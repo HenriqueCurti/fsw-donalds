@@ -4,17 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Restaurant } from "@prisma/client";
 import { ChevronLeftIcon, ScrollTextIcon } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 interface RestaurantHeaderProps {
   restaurant: Pick<Restaurant, "coverImageUrl" | "name">;
 }
 
 const RestaurantHeader = ({ restaurant }: RestaurantHeaderProps) => {
+  const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
 
   const handleBackClick = () => {
     router.back();
+  };
+
+  const handleOrdersClick = () => {
+    router.push(`/${slug}/orders`);
   };
 
   return (
@@ -39,6 +44,7 @@ const RestaurantHeader = ({ restaurant }: RestaurantHeaderProps) => {
         variant="secondary"
         size="icon"
         className="absolute top-4 right-4 rounded-full z-50"
+        onClick={handleOrdersClick}
       >
         <ScrollTextIcon />
       </Button>

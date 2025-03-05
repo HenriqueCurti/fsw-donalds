@@ -1,10 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { db } from "@/lib/prisma";
 import { OrderStatus, Prisma } from "@prisma/client";
 import Image from "next/image";
-import { notFound } from "next/navigation";
-
 interface OrderItemProps {
   order: Prisma.OrderGetPayload<{
     include: {
@@ -14,24 +11,16 @@ interface OrderItemProps {
           avatarImageUrl: true;
         };
       };
+      orderProducts: {
+        include: {
+          product: true;
+        };
+      };
     };
   }>;
 }
 
-const OrderItem = async ({ order }: OrderItemProps) => {
-  const orderProducts = await db.orderProduct.findMany({
-    where: {
-      orderId: order.id,
-    },
-    include: {
-      product: true,
-    },
-  });
-
-  if (!orderProducts) {
-    return notFound();
-  }
-
+const OrderItem = ({ order }: OrderItemProps) => {
   return (
     <div>
       <Card>
@@ -59,7 +48,7 @@ const OrderItem = async ({ order }: OrderItemProps) => {
             <p className="font-semibold text-sm">{order.restaurant.name}</p>
           </div>
           <Separator />
-          {orderProducts.map((product) => (
+          {order.orderProducts.map((product) => (
             <div key={product.id} className="flex items-center gap-2">
               <div className="h-5 w-5 flex items-center justify-center rounded-full bg-gray-400 text-white text-xs font-semibold">
                 {product.quantity}

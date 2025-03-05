@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { ConsumptionMethod } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 interface CreateOrderProps {
@@ -55,5 +56,6 @@ export const createOrder = async (input: CreateOrderProps) => {
     },
   });
 
+  revalidatePath(`/${input.slug}/orders`);
   redirect(`/${input.slug}/orders?phone=${input.customerPhone}`);
 };
